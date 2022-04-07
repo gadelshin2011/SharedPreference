@@ -1,4 +1,7 @@
 package com.example.sharedpreference
+
+import android.content.Context
+import android.content.SharedPreferences
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Button
@@ -8,48 +11,32 @@ import com.example.sharedpreference.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
     lateinit var binding: ActivityMainBinding
-    lateinit var edtName: EditText
-    lateinit var edtEmail: EditText
-    lateinit var SharedPreference:SharedPreference
+    lateinit var sp: SharedPreferences
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        sp = getSharedPreferences("data_storage", Context.MODE_PRIVATE)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        SharedPreference = SharedPreference(this)
         setListener()
-
     }
 
     private fun setListener() {
         binding.btnSave.setOnClickListener {
-            val edtName = binding.editName.text.toString()
-            val edtEmail = binding.editEmail.text.toString()
-            SharedPreference.saveString("name", edtName)
-            SharedPreference.saveString("email", edtEmail)
+            sp.edit().putString("name", binding.editName.text.toString()).apply()
+            sp.edit().putString("email", binding.editEmail.text.toString()).apply()
             Toast.makeText(this@MainActivity, "Data Stored", Toast.LENGTH_SHORT).show()
-
-
         }
 
         binding.btnRetrive.setOnClickListener {
-            if (SharedPreference.getValueString("name") != null) {
-                edtName.hint = SharedPreference.getValueString("name")!!
-                Toast.makeText(this@MainActivity, "Data Retrieved", Toast.LENGTH_SHORT).show()
-            } else {
-                //edtName.hint = "No value found"
-            }
-            if (SharedPreference.getValueString("email") != null) {
-                edtEmail.hint = SharedPreference.getValueString("email")!!
-                Toast.makeText(this@MainActivity, "Data Retrieved", Toast.LENGTH_SHORT).show()
-            } else {
-             //   edtEmail.hint = "No value found"
-            }
+            binding.editName.hint = sp.getString("name", "")
+            binding.editEmail.hint = sp.getString("email", "")
+            Toast.makeText(this@MainActivity, "Data Retrieved", Toast.LENGTH_SHORT).show()
         }
 
         binding.btnClear.setOnClickListener {
-            SharedPreference.clearSharedPreference()
-            Toast.makeText(this@MainActivity,"Data Cleared",Toast.LENGTH_SHORT).show()
+            sp.edit().clear().apply()
+            Toast.makeText(this@MainActivity, "Data Cleared", Toast.LENGTH_SHORT).show()
         }
 
 
